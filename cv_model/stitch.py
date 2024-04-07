@@ -14,7 +14,7 @@ settings = {'detector': 'sift',
     'finder': 'dp_color', 'adjuster': 
     'ray', 'warper_type': 'plane', 
     'block_size': 3, 'nfeatures': 15000, 
-    'wave_correct_kind': 'horiz', 
+    'wave_correct_kind': 'auto', 
     'match_conf': 0.4, 
     'crop': False, 
     'try_use_gpu': True
@@ -105,7 +105,15 @@ class SuperGlue:
         else:
             images = photos
 
-        return images
+        return [self.__flip_if_should__(img) for img in images]
+
+
+    def __flip_if_should__(self, img: Image):
+        height, width, channels = img.shape
+        if height > width:
+            return cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        return img
+
 
     def __calc_black_pixels__(self, image) -> int:
         """

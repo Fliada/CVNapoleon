@@ -4,10 +4,23 @@ from io import BytesIO
 from IPython.display import Image
 from pathlib import Path
 import numpy as np
-import cv2 
-import os
+import cv2
+import os, shutil
 
 super_glow = SuperGlue()
+
+def delete_directory(folder: Path):
+    for filename in os.listdir(str(folder.absolute())):
+        file_path = os.path.join(str(folder.absolute()), filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    os.remove(str(folder.absolute()))
 
 def main():
 
@@ -30,8 +43,8 @@ def main():
 
     if st.button('Преобразовать'):
         
-        if len(imgs) < 2: 
-            st.warning("Ты должен выбрать 2 или более фотографий")
+        if len(imgs) != 2: 
+            st.warning("Ты должен выбрать только 2 фотографии для склейки!")
             return
 
         best_img = super_glow.connect_photos(photos=imgs)
@@ -42,7 +55,7 @@ def main():
 
         st.image(str(path_img), channels="BGR")
 
-        os.remove(str(path_img / '../'))
+        delete_directory(path_img.parent)
 
         with open(str(best_img[1].absolute()), "rb") as file:
             btn = st.download_button(
