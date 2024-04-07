@@ -55,57 +55,43 @@ class SuperGlue:
     #TO DO
     def __first__(self, images: list[Image]) -> list[Image]:
         """
-        Первый слой обработки сгенерированных картинок с помощью YOLO\n
-        return: список картинок с наибольших количеством задетекченных товаров
+        Первый слой обработки сгенерированных картинок с помощью определения количества черных пикселей
+        return: список изображений с наименьшим количеством черных пикселей
         """
+
         RANGE_NUM = 10
-        min_supplies = 10e11
-        min_supplies_index = 0
-        _best_images_ = [(None, 1e10) for _ in range(int(RANGE_NUM / 2))]
-        best_images = []
 
-        for i in range(RANGE_NUM):
-            res = self.stitcher.stitch(images=images)
-            result = self.yolo_model.predict(res)
-            # Подсчитываем количество товаров
-            num_products = sum([len(result[i]) for i in range(len(result))])
-            # print("Количество обнаруженных товаров:", num_products)
-
-            if num_products < min_supplies:
-                curr_min = 10e11
-                _best_images_[min_supplies_index] = (res, num_products)
-                for image_index in range(len(_best_images_)):
-                    if (
-                        _best_images_[image_index][1] < min_supplies
-                        and _best_images_[image_index][1] < curr_min
-                    ):
-                        min_supplies = _best_images_[image_index][1]
-                        min_supplies_index = image_index
-                        curr_min = _best_images_[image_index][1]
-
-        for image_index in range(len(_best_images_)):
-            if _best_images_[image_index][0] is None: 
-                continue
-            best_images.append(_best_images_[image_index][0])
-
-        return best_images
-
+        # Генерируем изображения с помощью Stitcher
+        generated_images = [self.stitcher.stitch(images=images) for _ in range(RANGE_NUM)]  # Генерируем 5 изображений
+        # Создаем список кортежей, содержащих сгенерированное изображение и количество черных пикселей
+        black_pixels_list = [(img, self.__calc_black_pixels__(img)) for img in generated_images]
+        # Сортируем список по количеству черных пикселей
+        sorted_images = sorted(black_pixels_list, key=lambda x: x[1])
+        # Возвращаем только изображения с наименьшим количеством черных пикселей
+        return [img for img, _ in sorted_images[:int(RANGE_NUM / 2)]]  # Возвращаем изображения с наименьшим количеством черных пикселей
+    
 
     def __second__(self, images : list[Image]) -> Image:
         """
-        Второй слой обработки сгенерированных картинок с помощью определения количества пустот\n
-        return: лучшая склеенная картинка
+        Второй слой обработки сгенерированных картинок с помощью YOLO
+        return: изображение с наибольшим количеством обнаруженных товаров
         """
-        result_best = None
-        best_black_pixels = 1e11
+        # Инициализируем переменные для хранения наилучшего результата
+        best_num_products = 0
+        best_image = None
 
+        # Проходимся по каждому изображению из списка
         for img in images:
-            black_pixels = self.__calc_black_pixels__(img)
-            if black_pixels < best_black_pixels:
-                best_black_pixels = black_pixels
-                result_best = img
+            # Получаем результаты предсказания моделью YOLO
+            result = self.yolo_model.predict(img)
+            # Подсчитываем количество обнаруженных товаров
+            num_products = sum([len(result[i]) for i in range(len(result))])
+            # Если это изображение дает лучший результат, обновляем переменные
+            if num_products > best_num_products:
+                best_num_products = num_products
+                best_image = img
 
-        return result_best
+        return best_image
 
 
     #TO DO
@@ -136,6 +122,6 @@ class SuperGlue:
         plt.show()
 
     def save_yolo(self, img: Image) -> Path:
-        result = self.yolo_model.predict(image=img, project="preds", name="run")
+        self.yolo_model.predict(image=img, project="preds", name="run")
         return CUR_PATH / 'preds' / 'run' / 'image0.jpg'
         
