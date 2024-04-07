@@ -1,14 +1,14 @@
 # CVNapoleon
 Кейс от NapoleonIT
 
-Структура документа:
-|- cv_models/
-    | - front.py                        (фронт)
-    | - stitch.py                       (класс для преобразования фотографий)
-    | - testing.ipynb                   (notebook для тестирование класса)
-|- hack_stitch_dataset/                 (датасет для обучения)
-    | - ...
-|- product-detection-in-shelf-yolov8    (дообученная модель)
+Структура документа:<br />
+|- cv_models/<br />
+    | - front.py                        (фронт)<br />
+    | - stitch.py                       (класс для преобразования фотографий)<br />
+    | - testing.ipynb                   (notebook для тестирование класса)<br />
+|- hack_stitch_dataset/                 (датасет для обучения)<br />
+    | - ...<br />
+|- product-detection-in-shelf-yolov8    (дообученная модель)<br />
 
 Чтобы запустить фронт нужно ввести команду:
 ```python
