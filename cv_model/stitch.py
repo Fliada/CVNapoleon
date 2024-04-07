@@ -24,7 +24,7 @@ CUR_PATH = Path('')
 
 RESULT_PATH = CUR_PATH / "cv_model\\best_result.jpeg"
 
-class SuperGlow:
+class SuperGlue:
     def __init__(self):
         #Инициализируем stitcher
         self.stitcher = Stitcher(**settings)

@@ -1,5 +1,5 @@
 import streamlit as st
-from stitch import SuperGlow
+from stitch import SuperGlue
 from io import BytesIO
 from IPython.display import Image
 from pathlib import Path
@@ -7,7 +7,7 @@ import numpy as np
 import cv2 
 import os
 
-super_glow = SuperGlow()
+super_glow = SuperGlue()
 
 def main():
 
